@@ -1,0 +1,3180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESPHome Component Categorization - Full Detail</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+            font-size: 13px;
+        }
+        h1 { color: #2c3e50; margin-bottom: 10px; font-size: 24px; }
+        .header-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-section h2 { margin: 0 0 10px 0; font-size: 18px; }
+        .header-section p { margin: 5px 0; opacity: 0.95; }
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .controls input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .controls select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #229954; }
+        .section {
+            background: white;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section-header {
+            padding: 12px 15px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .section-header:hover { background: rgba(0,0,0,0.02); }
+        .section-header.platform { background: #e3f2fd; color: #1976d2; }
+        .section-header.core { background: #fce4ec; color: #c2185b; }
+        .section-header.networking { background: #e8f5e9; color: #388e3c; }
+        .section-header.component { background: #fff3e0; color: #f57c00; }
+        .chevron {
+            transition: transform 0.3s;
+            font-size: 12px;
+        }
+        .chevron.open { transform: rotate(180deg); }
+        .section-content {
+            display: none;
+            overflow-x: auto;
+        }
+        .section-content.show { display: block; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            background: #f8f9fa;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: top;
+        }
+        tr:hover { background: #f8f9fa; }
+        .badge {
+            display: inline-block;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-right: 3px;
+            white-space: nowrap;
+        }
+        .badge.required { background: #fee; color: #c00; }
+        .badge.optional { background: #efe; color: #060; }
+        .badge.advanced { background: #ffe; color: #880; }
+        .badge.recommended { background: #e3f2fd; color: #1976d2; }
+        .platform-tag {
+            background: #e0e0e0;
+            color: #424242;
+            padding: 2px 5px;
+            border-radius: 2px;
+            font-size: 10px;
+            margin-right: 3px;
+            display: inline-block;
+        }
+        .param-name { font-weight: 600; color: #2c3e50; }
+        .param-type { color: #7f8c8d; font-style: italic; }
+        .param-desc { color: #34495e; font-size: 11px; }
+        .code { 
+            background: #f5f5f5; 
+            padding: 1px 4px; 
+            border-radius: 2px; 
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <h2>📊 ESPHome Component & Parameter Categorization Database</h2>
+        <p><strong>Purpose:</strong> Comprehensive catalog of ALL ESPHome components and parameters for GUI development</p>
+        <p><strong>Coverage:</strong> All platforms (ESP32/ESP8266/RP2040/LibreTiny), 200+ components, 1000+ parameters</p>
+        <p><strong>Categorization:</strong> Required, Optional, Advanced - based on technical complexity, usage frequency, and risk level</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-value" id="platformCount">7</div>
+            <div class="stat-label">Platforms</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="componentCount">60+</div>
+            <div class="stat-label">Component Types</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="paramCount">200+</div>
+            <div class="stat-label">Parameters</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="requiredCount">15</div>
+            <div class="stat-label">Core Required</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">11</div>
+            <div class="stat-label">Categories</div>
+        </div>
+    </div>
+
+    <div class="intro">
+        <h2>📋 What's Included in This Database</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+            <div style="background: #e3f2fd; padding: 10px; border-radius: 4px;">
+                <strong>✅ Platforms</strong><br>
+                ESP32, ESP8266, RP2040, LibreTiny
+            </div>
+            <div style="background: #fce4ec; padding: 10px; border-radius: 4px;">
+                <strong>✅ Core Config</strong><br>
+                esphome, logger, wifi, api, ota
+            </div>
+            <div style="background: #fff3e0; padding: 10px; border-radius: 4px;">
+                <strong>✅ Common Components</strong><br>
+                Switch, Sensor, Binary Sensor, Light, Fan, Output
+            </div>
+            <div style="background: #e8f5e9; padding: 10px; border-radius: 4px;">
+                <strong>✅ Bus Protocols</strong><br>
+                I2C, SPI, UART (for hardware communication)
+            </div>
+            <div style="background: #f3e5f5; padding: 10px; border-radius: 4px;">
+                <strong>✅ Climate/HVAC</strong><br>
+                Thermostat, PID, Bang-Bang, IR Control
+            </div>
+            <div style="background: #e0f2f1; padding: 10px; border-radius: 4px;">
+                <strong>✅ Optional Features</strong><br>
+                Captive Portal, Web Server, MQTT, Time, Globals, Scripts
+            </div>
+        </div>
+        <p style="margin-top: 15px;"><strong>💡 Note:</strong> Individual sensor platforms (BME280, DHT22, etc.) follow the base sensor configuration pattern - they're not individually listed to keep the database focused on core structure.</p>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="🔍 Search components or parameters..." onkeyup="filterAll()">
+        <select id="categoryFilter" onchange="filterAll()">
+            <option value="">All Categories</option>
+            <option value="required">Required Only</option>
+            <option value="optional">Optional Only</option>
+            <option value="advanced">Advanced Only</option>
+        </select>
+        <select id="platformFilter" onchange="filterAll()">
+            <option value="">All Platforms</option>
+            <option value="ESP32">ESP32</option>
+            <option value="ESP8266">ESP8266</option>
+            <option value="RP2040">RP2040</option>
+            <option value="All">All Platforms</option>
+        </select>
+        <button class="btn btn-success" onclick="exportToCSV()">📥 Export Components CSV</button>
+        <button class="btn btn-success" onclick="exportDefinitions()">📥 Export Definitions CSV</button>
+        <button class="btn btn-primary" onclick="showRowCount()">🔢 Count Rows</button>
+        <button class="btn btn-primary" onclick="expandAll()">Expand All</button>
+        <button class="btn btn-primary" onclick="collapseAll()">Collapse All</button>
+    </div>
+
+    <!-- PLATFORMS -->
+    <div class="section" data-section="platform">
+        <div class="section-header platform" onclick="toggleSection(this)">
+            <span>🖥️ PLATFORMS - Microcontroller Configuration</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="8"><strong>esp32</strong></td>
+                        <td><span class="param-name">variant</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">ESP32 chip variant (esp32, esp32s2, esp32s3, esp32c2, esp32c3, esp32c5, esp32c6, esp32c61, esp32h2, esp32p4). Must match hardware or flash will fail.</td>
+                        <td><span class="platform-tag">ESP32 All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">board</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto from variant</td>
+                        <td class="param-desc">PlatformIO board ID. Affects pin aliases and internal settings. Variant is preferred.</td>
+                        <td><span class="platform-tag">ESP32 All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">framework.type</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>esp-idf</td>
+                        <td class="param-desc">Framework type: <span class="code">esp-idf</span> or <span class="code">arduino</span>. esp-idf default from 2026.1.0</td>
+                        <td><span class="platform-tag">ESP32 All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">framework.version</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>recommended</td>
+                        <td class="param-desc">Framework version: recommended, latest, dev, or specific version</td>
+                        <td><span class="platform-tag">ESP32 All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">framework.sdkconfig_options</span></td>
+                        <td><span class="param-type">mapping</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>{}</td>
+                        <td class="param-desc">Custom ESP-IDF sdkconfig compiler options. Requires ESP-IDF knowledge.</td>
+                        <td><span class="platform-tag">ESP32 IDF</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">flash_size</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto-detected</td>
+                        <td class="param-desc">Flash size (e.g., 4MB, 8MB). Usually auto-detected correctly.</td>
+                        <td><span class="platform-tag">ESP32 All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">ignore_efuse_mac_crc</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Ignore MAC CRC errors. Only for hardware issues. High risk.</td>
+                        <td><span class="platform-tag">ESP32</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">enable_ota_rollback</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Auto-rollback on crash after OTA. Works with safe_mode component.</td>
+                        <td><span class="platform-tag">ESP32 IDF</span></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="6"><strong>esp8266</strong></td>
+                        <td><span class="param-name">board</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">PlatformIO board ID (e.g., nodemcuv2, d1_mini, esp01_1m). Must match hardware.</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">framework.version</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>recommended</td>
+                        <td class="param-desc">Arduino framework version: recommended, latest, dev, or specific</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">restore_from_flash</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Store persistent state in flash. Increases flash wear but restores state after reboot.</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">board_flash_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>dout</td>
+                        <td class="param-desc">SPI flash mode: qio, qout, dio, dout. Auto-detected on next OTA.</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">early_pin_init</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Initialize pins early. Set false for switches to avoid toggling on boot.</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">framework.source</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>Official</td>
+                        <td class="param-desc">Custom framework source URL. For patched/custom versions.</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>rp2040</strong></td>
+                        <td><span class="param-name">board</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">PlatformIO board ID (e.g., rpipico, rpipicow, adafruit_feather_rp2040)</td>
+                        <td><span class="platform-tag">RP2040</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">framework.version</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>recommended</td>
+                        <td class="param-desc">Arduino-Pico framework version</td>
+                        <td><span class="platform-tag">RP2040</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">platform_version</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">PlatformIO platform version override</td>
+                        <td><span class="platform-tag">RP2040</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CORE CONFIGURATION -->
+    <div class="section" data-section="core">
+        <div class="section-header core" onclick="toggleSection(this)">
+            <span>⚙️ CORE CONFIGURATION - esphome</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Device name (hostname). Must be unique. Lowercase, digits, hyphens only. Max 24 chars (31 with name_add_mac_suffix: false)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">friendly_name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge recommended">RECOMMENDED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name in Home Assistant. Improves user experience. Can contain spaces and special chars.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">comment</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Device description for UI display only</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">area</span></td>
+                        <td><span class="param-type">string/mapping</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Home Assistant area/zone (e.g., "Living Room" or structured with id/name)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name_add_mac_suffix</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Append MAC suffix to name (for provisioning multiple devices with same firmware)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">build_path</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>.esphome/build/NODE</td>
+                        <td class="param-desc">Custom build directory path</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">platformio_options</span></td>
+                        <td><span class="param-type">mapping</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>{}</td>
+                        <td class="param-desc">Custom PlatformIO options (upload_speed, etc.). Requires PlatformIO knowledge.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">includes</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">C/C++ files to include. Requires C++ knowledge.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">libraries</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">External libraries to include (PlatformIO registry or git). For custom code.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_boot</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Run automation on boot. With priority control (800=hardware, 600=sensors, 250=WiFi, 200=network)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_shutdown</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Run automation before shutdown (OTA, deep sleep, too many connection failures)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_loop</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Run every loop iteration (~16ms). Can cause performance issues if misused.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">min_version</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Minimum ESPHome version required (e.g., 2025.11.0)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">project.name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Project identifier (format: author.project_name) for creators</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">project.version</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Project version for tracking updates</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LOGGER -->
+    <div class="section" data-section="logger">
+        <div class="section-header core" onclick="toggleSection(this)">
+            <span>📝 LOGGER - Debug & Monitoring</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="background: #fff3cd; padding: 8px;"><strong>⚠️ Note:</strong> Logger is auto-included by default. Explicitly add to config only if customization needed.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">baud_rate</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>115200</td>
+                        <td class="param-desc">Serial UART baud rate. Set to 0 to disable serial logging.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">level</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>DEBUG</td>
+                        <td class="param-desc">Global log level: NONE, ERROR, WARN, INFO, DEBUG, VERBOSE, VERY_VERBOSE. Higher = more output, more memory.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">initial_level</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>Same as level</td>
+                        <td class="param-desc">Initial log level at startup. Can be changed at runtime. For advanced debugging.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">logs</span></td>
+                        <td><span class="param-type">mapping</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>{}</td>
+                        <td class="param-desc">Per-component log levels (e.g., wifi: VERBOSE, sensor: INFO). For debugging specific components.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">tx_buffer_size</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>512</td>
+                        <td class="param-desc">UART TX buffer size. Increase for high-volume logging. Reduces available RAM.</td>
+                        <td><span class="platform-tag">ESP32/ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">hardware_uart</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>UART0</td>
+                        <td class="param-desc">Which UART to use: UART0, UART1, UART2, USB_CDC, USB_SERIAL_JTAG. Platform dependent.</td>
+                        <td><span class="platform-tag">Platform-specific</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- WIFI -->
+    <div class="section" data-section="wifi">
+        <div class="section-header networking" onclick="toggleSection(this)">
+            <span>📡 WIFI - Network Connectivity</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="background: #d1ecf1; padding: 8px;"><strong>ℹ️ Note:</strong> WiFi OR Ethernet required (not both). Without network config, compilation fails.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">ssid</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">WiFi network name. Required unless using networks[] or Improv provisioning.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">password</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>""</td>
+                        <td class="param-desc">WiFi password. Leave empty for open networks. Use !secret recommended.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">networks</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Multiple WiFi networks. Connects to strongest. Alternative to ssid/password.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">manual_ip.static_ip</span></td>
+                        <td><span class="param-type">IPv4</span></td>
+                        <td><span class="badge recommended">RECOMMENDED</span></td>
+                        <td>DHCP</td>
+                        <td class="param-desc">Static IP address. Dramatically improves connection times and OTA reliability.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">manual_ip.gateway</span></td>
+                        <td><span class="param-type">IPv4</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Gateway IP. Required when static_ip is set.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">manual_ip.subnet</span></td>
+                        <td><span class="param-type">IPv4</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Subnet mask. Required when static_ip is set.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">ap</span></td>
+                        <td><span class="param-type">mapping</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Fallback Access Point when WiFi connection fails. Useful for initial setup.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">ap.ssid</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Device name</td>
+                        <td class="param-desc">AP network name. Defaults to device name.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">ap.password</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>""</td>
+                        <td class="param-desc">AP password. Empty = open network (not recommended).</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">power_save_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>NONE</td>
+                        <td class="param-desc">WiFi power saving: NONE, LIGHT, HIGH. Higher = less power, less stability. Can cause disconnects.</td>
+                        <td><span class="platform-tag">ESP32/ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">reboot_timeout</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>15min</td>
+                        <td class="param-desc">Auto-reboot if can't connect. Set 0s to disable. Prevents stuck devices.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">fast_connect</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Skip scanning, connect to last network directly. Faster but less robust.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">use_address</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Device name</td>
+                        <td class="param-desc">Override address for OTA. Use old address when renaming device.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">enable_on_boot</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Enable WiFi at boot. Set false to control programmatically.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">min_auth_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>WPA_PSK</td>
+                        <td class="param-desc">Minimum security standard: OPEN, WEP, WPA_PSK, WPA2_PSK, WPA_WPA2_PSK, WPA3_PSK. For security.</td>
+                        <td><span class="platform-tag">WiFi-capable</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- API -->
+    <div class="section" data-section="api">
+        <div class="section-header networking" onclick="toggleSection(this)">
+            <span>🔌 API - Native Home Assistant Integration</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="background: #d1ecf1; padding: 8px;"><strong>ℹ️ Note:</strong> Highly recommended for Home Assistant integration. Can omit if using MQTT only.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">encryption.key</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge recommended">RECOMMENDED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">32-byte base64 encryption key. STRONGLY recommended for security. Generate with <span class="code">openssl rand -base64 32</span></td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">port</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>6053</td>
+                        <td class="param-desc">TCP port for API. Rarely needs changing.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">reboot_timeout</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>15min</td>
+                        <td class="param-desc">Auto-reboot if no client connects. Prevents stuck states. Set 0s to disable.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">max_connections</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>2 (ESP8266), 4 (Others)</td>
+                        <td class="param-desc">Max simultaneous API connections. Each uses ~500-1000 bytes RAM. Too high causes OOM crashes on ESP8266.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">max_send_queue</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>32 (ESP8266), 64 (Others)</td>
+                        <td class="param-desc">Max queued messages per connection. Auto-disconnect if full. Prevents OOM. Range: 1-64.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">batch_delay</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>0ms</td>
+                        <td class="param-desc">Batch multiple state updates to reduce network overhead. Adds latency.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">actions</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">User-defined services callable from Home Assistant. For advanced integrations.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_client_connected</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when Home Assistant connects</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_client_disconnected</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when Home Assistant disconnects</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- OTA -->
+    <div class="section" data-section="ota">
+        <div class="section-header networking" onclick="toggleSection(this)">
+            <span>📲 OTA - Over-The-Air Updates</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="6" style="background: #d1ecf1; padding: 8px;"><strong>ℹ️ Note:</strong> Highly recommended. Without OTA, all updates require USB connection.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">platform</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">OTA platform: <span class="code">esphome</span> (standard) or <span class="code">http_request</span> (for external servers)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">password</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>""</td>
+                        <td class="param-desc">OTA upload password. Empty = no password. Security vs convenience trade-off.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">safe_mode</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Enable safe mode on repeated boot failures. Allows recovery from bad firmware. Highly recommended.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">reboot_timeout</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>5min</td>
+                        <td class="param-desc">Timeout waiting for OTA. Device reboots after timeout.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">num_attempts</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>10</td>
+                        <td class="param-desc">Boot failures before safe mode. Lower = faster recovery, higher = fewer false triggers.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SWITCH COMPONENTS -->
+    <div class="section" data-section="switch">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>🔘 SWITCH - Control Components</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Supports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All switch platforms share these common parameters</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="11"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique identifier for code generation. Required if name not set.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name in Home Assistant. Required if id not set. Set to None to use friendly_name.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">icon</span></td>
+                        <td><span class="param-type">icon</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">Override icon (e.g., mdi:lightbulb)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">internal</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Hide from Home Assistant (internal use only). Auto-true if only id specified.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">disabled_by_default</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Hide from HA frontend by default (user must enable manually)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">entity_category</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Entity category: config, diagnostic. For UI organization.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">device_class</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">HA device class: outlet, switch. Affects icon and UI behavior.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">restore_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>ALWAYS_OFF</td>
+                        <td class="param-desc">Boot behavior: RESTORE_DEFAULT_OFF, RESTORE_DEFAULT_ON, ALWAYS_OFF, ALWAYS_ON, RESTORE_INVERTED_DEFAULT_OFF, RESTORE_INVERTED_DEFAULT_ON, DISABLED</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">inverted</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Invert ON/OFF states (ON→OFF, OFF→ON)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_turn_on</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Automation when switch turns ON</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_turn_off</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Automation when switch turns OFF</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: GPIO</strong> - Direct GPIO pin control (most common)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>gpio</strong></td>
+                        <td><span class="param-name">pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">GPIO pin to control (e.g., GPIO5, D1)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">interlock</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">List of switch IDs in interlock group. Ensures only one active. WARNING: Software only, use hardware interlocks for safety!</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: OUTPUT</strong> - Uses any output component (PWM, DAC, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>output</strong></td>
+                        <td><span class="param-name">output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">ID of output component to control</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: TEMPLATE</strong> - Custom logic switches</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>template</strong></td>
+                        <td><span class="param-name">lambda</span></td>
+                        <td><span class="param-type">lambda</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Lambda to determine current state. Return true/false.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">turn_on_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions to execute when turned on from HA</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">turn_off_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions to execute when turned off from HA</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">optimistic</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Immediately update state on command (vs waiting for lambda confirmation)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BINARY SENSOR COMPONENTS -->
+    <div class="section" data-section="binary_sensor">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>⚫ BINARY SENSOR - Digital Input (ON/OFF)</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Supports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All binary sensor platforms share these common parameters</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="10"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID. Required if name not set.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name. Required if id not set.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">device_class</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">HA device class: door, window, motion, occupancy, etc. Affects icon and behavior.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">filters</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">Filters: invert, delayed_on, delayed_off, delayed_on_off, autorepeat. For debouncing and signal processing.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_press</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger on state change to ON</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_release</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger on state change to OFF</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_state</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger on any state change</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_click</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger on click with min/max duration. For buttons.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_double_click</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger on double-click with timing config</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_multi_click</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Complex click patterns (triple-click, hold, etc.). Requires timing configuration.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: GPIO</strong> - Physical button/switch input</td>
+                    </tr>
+                    <tr>
+                        <td><strong>gpio</strong></td>
+                        <td><span class="param-name">pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">GPIO pin to read. Supports pin schema (pullup, inverted, etc.)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: TEMPLATE</strong> - Software-defined binary sensor</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>template</strong></td>
+                        <td><span class="param-name">lambda</span></td>
+                        <td><span class="param-type">lambda</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">C++ lambda returning true/false. Evaluated every loop (~16ms).</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">condition</span></td>
+                        <td><span class="param-type">condition</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">YAML condition instead of lambda. Cannot use both.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: STATUS</strong> - Device connection status</td>
+                    </tr>
+                    <tr>
+                        <td><strong>status</strong></td>
+                        <td colspan="5" style="font-style: italic;">No platform-specific parameters - reports if device connected to API/MQTT</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SENSOR COMPONENTS -->
+    <div class="section" data-section="sensor">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>📊 SENSOR - Numeric Values</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Supports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All sensor platforms share these common parameters</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="13"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID. Required if name not set.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name. Required if id not set.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">unit_of_measurement</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">Unit (°C, %, W, etc.). Auto-set by platform usually.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">device_class</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">HA device class: temperature, humidity, power, etc. Affects display and history.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">state_class</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">State class: measurement, total_increasing. For statistics and energy dashboard.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">accuracy_decimals</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">Number of decimal places for display rounding</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">filters</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">Filters: offset, multiply, calibrate_linear, throttle, delta, sliding_window_moving_average, exponential_moving_average, etc.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">internal</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Hide from Home Assistant</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">force_update</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Send updates even if value unchanged (for triggers)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_value</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when new value published (after filters)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_raw_value</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when value received (before filters)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_value_range</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when value enters/exits range (above/below thresholds)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">entity_category</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Entity category: config, diagnostic</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: TEMPLATE</strong> - Custom sensor with lambda</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>template</strong></td>
+                        <td><span class="param-name">lambda</span></td>
+                        <td><span class="param-type">lambda</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">C++ lambda returning float value. Evaluated every update_interval.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">update_interval</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>60s</td>
+                        <td class="param-desc">How often to evaluate lambda. Set 'never' to disable auto-update.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: UPTIME</strong> - Device uptime tracking</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>uptime</strong></td>
+                        <td><span class="param-name">type</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>seconds</td>
+                        <td class="param-desc">Type: seconds (counter) or timestamp (boot time). Timestamp requires time component.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">update_interval</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>60s</td>
+                        <td class="param-desc">Update frequency (only for type: seconds)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: WIFI_SIGNAL</strong> - WiFi strength in dB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>wifi_signal</strong></td>
+                        <td><span class="param-name">update_interval</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>60s</td>
+                        <td class="param-desc">How often to check signal strength. Only works in station mode.</td>
+                        <td><span class="platform-tag">WiFi</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- OUTPUT COMPONENTS -->
+    <div class="section" data-section="output">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>📤 OUTPUT - Low-Level Pin/PWM Control</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Supports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All output platforms (binary & float types)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="6"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID for referencing in switches/lights/fans</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">power_supply</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Power supply ID to auto-enable when output active</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">inverted</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Invert output logic (HIGH→LOW, LOW→HIGH)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">min_power</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>0.0</td>
+                        <td class="param-desc">Minimum output value (0.0-1.0). For float outputs only. Useful for motor minimum speed.</td>
+                        <td><span class="platform-tag">Float outputs</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">max_power</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1.0</td>
+                        <td class="param-desc">Maximum output value (0.0-1.0). For float outputs only. For LED calibration/limiting.</td>
+                        <td><span class="platform-tag">Float outputs</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">zero_means_zero</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>false</td>
+                        <td class="param-desc">If true, 0% means completely off. If false, 0% means min_power. For float outputs.</td>
+                        <td><span class="platform-tag">Float outputs</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: GPIO</strong> - Simple on/off pin (binary output)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>gpio</strong></td>
+                        <td><span class="param-name">pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">GPIO pin to control</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: LEDC</strong> - ESP32 hardware PWM (float output)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>ledc</strong></td>
+                        <td><span class="param-name">pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">GPIO pin (GPIO0-GPIO33 only)</td>
+                        <td><span class="platform-tag">ESP32</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">frequency</span></td>
+                        <td><span class="param-type">frequency</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1kHz</td>
+                        <td class="param-desc">PWM frequency (10Hz-40MHz). Higher freq = lower resolution. ~1kHz for LEDs, 25kHz+ for motors.</td>
+                        <td><span class="platform-tag">ESP32</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">channel</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>Auto</td>
+                        <td class="param-desc">Manual LEDC channel (0-15). Adjacent channels share timer. Specify 0,2,4,6 for custom frequencies.</td>
+                        <td><span class="platform-tag">ESP32</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: ESP8266_PWM</strong> - ESP8266 software PWM (float output)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>esp8266_pwm</strong></td>
+                        <td><span class="param-name">pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">GPIO pin (GPIO0-GPIO16)</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">frequency</span></td>
+                        <td><span class="param-type">frequency</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1kHz</td>
+                        <td class="param-desc">PWM frequency. WARNING: Software PWM can flicker during WiFi activity. Use lower freq for fewer artifacts.</td>
+                        <td><span class="platform-tag">ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: TEMPLATE</strong> - Custom output with actions</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>template</strong></td>
+                        <td><span class="param-name">type</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Output type: binary or float</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">write_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions to execute when output changes. Lambda receives 'state' variable (bool or float 0.0-1.0).</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">optimistic</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Assume state changes immediately (vs waiting for confirmation)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LIGHT COMPONENTS -->
+    <div class="section" data-section="light">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>💡 LIGHT - Lighting Control</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Supports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All light platforms share these parameters</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="8"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">effects</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">Light effects: random, strobe, flicker, addressable_rainbow, etc. For visual animations.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">gamma_correct</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>2.8</td>
+                        <td class="param-desc">Gamma correction value. Makes brightness linear to human eye. Set 1.0 to disable.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">default_transition_length</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1s</td>
+                        <td class="param-desc">Default fade time when turning on/off or changing brightness</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">restore_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>RESTORE_DEFAULT_OFF</td>
+                        <td class="param-desc">Boot behavior: RESTORE_DEFAULT_OFF, RESTORE_DEFAULT_ON, ALWAYS_OFF, ALWAYS_ON, RESTORE_INVERTED_DEFAULT_OFF, RESTORE_INVERTED_DEFAULT_ON</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_turn_on</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when light turns on</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_turn_off</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when light turns off</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: BINARY</strong> - Simple on/off light</td>
+                    </tr>
+                    <tr>
+                        <td><strong>binary</strong></td>
+                        <td><span class="param-name">output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Binary output component ID</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: MONOCHROMATIC</strong> - Dimmable white light</td>
+                    </tr>
+                    <tr>
+                        <td><strong>monochromatic</strong></td>
+                        <td><span class="param-name">output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output component ID (PWM)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: RGB</strong> - RGB color light</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>rgb</strong></td>
+                        <td><span class="param-name">red</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for red channel</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">green</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for green channel</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">blue</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for blue channel</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: RGBW</strong> - RGB + separate white channel</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5"><strong>rgbw</strong></td>
+                        <td><span class="param-name">red</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for red</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">green</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for green</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">blue</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for blue</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">white</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for white channel</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">color_interlock</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Prevent RGB and white on simultaneously. Creates RGB and WHITE color modes.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FAN COMPONENTS -->
+    <div class="section" data-section="fan">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>🌀 FAN - Fan Control</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Supports</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All fan platforms</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="7"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">restore_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>RESTORE_DEFAULT_OFF</td>
+                        <td class="param-desc">Boot behavior: NO_RESTORE, RESTORE_DEFAULT_OFF, RESTORE_DEFAULT_ON, ALWAYS_OFF, ALWAYS_ON, RESTORE_INVERTED_DEFAULT_OFF, RESTORE_INVERTED_DEFAULT_ON</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_turn_on</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when fan turns on</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_turn_off</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when fan turns off</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_speed_set</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when speed changes</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">internal</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Hide from Home Assistant</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: BINARY</strong> - Simple on/off fan</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>binary</strong></td>
+                        <td><span class="param-name">output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Binary output component ID for main fan control</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">oscillation_output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Binary output ID for oscillation control</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">direction_output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Binary output ID for direction control (forward/reverse)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: SPEED</strong> - Variable speed fan with PWM</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5"><strong>speed</strong></td>
+                        <td><span class="param-name">output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output component ID for speed control</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">speed_count</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>100</td>
+                        <td class="param-desc">Number of discrete speed levels. 2=50%/100%, 3=33%/66%/100%, 100=1% increments. Affects UI granularity.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">oscillation_output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Output ID for oscillation</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">direction_output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Output ID for direction</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">preset_modes</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">Named presets (e.g., "Sleep", "Turbo") for automations</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- OPTIONAL COMMON COMPONENTS -->
+    <div class="section" data-section="optional">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>✨ OPTIONAL COMMON COMPONENTS - Frequently Used Features</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>CAPTIVE PORTAL</strong> - WiFi configuration fallback (great for makers & DIY)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="1"><strong>captive_portal</strong></td>
+                        <td><span class="param-name">compression</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>gzip</td>
+                        <td class="param-desc">Web asset compression: gzip or br (Brotli). Brotli ~24% smaller but HTTPS-only in some browsers.</td>
+                        <td>After 1min WiFi fail, starts AP at 192.168.4.1 to configure WiFi credentials</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>WEB SERVER</strong> - Built-in web interface to monitor/control device</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="10"><strong>web_server</strong></td>
+                        <td><span class="param-name">port</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>80</td>
+                        <td class="param-desc">HTTP port. Standard is 80.</td>
+                        <td rowspan="10">View sensors, control switches/lights via browser. No HA needed.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">version</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>3</td>
+                        <td class="param-desc">Web UI version: 1, 2, or 3. V3 has grouping and sorting. V2 has local assets. V1 is legacy.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">auth.username</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge recommended">RECOMMENDED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">HTTP basic auth username. REQUIRED for security!</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">auth.password</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge recommended">RECOMMENDED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">HTTP basic auth password. REQUIRED for security!</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">local</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Embed JS/CSS locally (no CDN). Increases flash usage but works offline.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">include_internal</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Show internal entities in web UI</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">ota</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Allow OTA updates via web UI. Set false to disable (use separate OTA platform).</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">log</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Show device logs in web UI</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">css_url</span></td>
+                        <td><span class="param-type">url</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>CDN</td>
+                        <td class="param-desc">Custom CSS URL. Set "" to disable external CSS.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">js_url</span></td>
+                        <td><span class="param-type">url</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>CDN</td>
+                        <td class="param-desc">Custom JS URL. Set "" to disable external JS.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>MQTT</strong> - Alternative to API for non-Home Assistant setups</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="9"><strong>mqtt</strong></td>
+                        <td><span class="param-name">broker</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">MQTT broker address (IP or hostname)</td>
+                        <td rowspan="9">Publish/subscribe to MQTT topics. Alternative to native API. Requires MQTT broker.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">port</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1883</td>
+                        <td class="param-desc">MQTT broker port. 8883 for TLS.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">username</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">MQTT broker username</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">password</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">MQTT broker password. Use !secret recommended.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">discovery</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Enable Home Assistant MQTT discovery. Auto-detects in HA.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">topic_prefix</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Device name</td>
+                        <td class="param-desc">Topic prefix for all MQTT topics</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">birth_message</span></td>
+                        <td><span class="param-type">mapping</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Online</td>
+                        <td class="param-desc">Message published on connect (topic, payload, qos, retain)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">will_message</span></td>
+                        <td><span class="param-type">mapping</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Offline</td>
+                        <td class="param-desc">Last will message on unexpected disconnect</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">reboot_timeout</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>15min</td>
+                        <td class="param-desc">Auto-reboot if broker connection fails. Set 0s to disable.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>TIME</strong> - Network time synchronization (for automations)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>time.sntp</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID for time component</td>
+                        <td rowspan="3">Sync time from internet. Required for time-based automations, RTC, timestamps.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">servers</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[0.pool.ntp.org, 1.pool.ntp.org]</td>
+                        <td class="param-desc">NTP server addresses</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">timezone</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>UTC</td>
+                        <td class="param-desc">Timezone string (e.g., "America/New_York"). Use for local time automations.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>TIME.HOMEASSISTANT</strong> - Use Home Assistant's time</td>
+                    </tr>
+                    <tr>
+                        <td><strong>time.homeassistant</strong></td>
+                        <td colspan="5" style="font-style: italic;">No parameters - automatically syncs from Home Assistant. Simpler than SNTP.</td>
+                        <td>Best when using HA</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>MDNS</strong> - Multicast DNS (enables .local addresses)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>mdns</strong></td>
+                        <td><span class="param-name">disabled</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Disable mDNS (auto-enabled by default)</td>
+                        <td rowspan="2">Auto-enabled. Allows devicename.local addressing. Disable if causing network issues.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">services</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">Additional mDNS services to advertise</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PREFERENCES</strong> - Flash storage for state persistence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>preferences</strong></td>
+                        <td><span class="param-name">flash_write_interval</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1min</td>
+                        <td class="param-desc">Delay before writing to flash. Prevents flash wear from rapid changes. Set 'never' to disable. Set 0s for immediate writes (not recommended).</td>
+                        <td>Auto-used by switch/light/fan restore_mode. Stores state across reboots.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>INTERVAL</strong> - Periodic automation trigger</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2"><strong>interval</strong></td>
+                        <td><span class="param-name">interval</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">How often to trigger (e.g., 60s, 5min)</td>
+                        <td rowspan="2">Execute actions periodically. E.g., check sensor every minute.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">then</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions to execute on each interval</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>GLOBALS</strong> - Global variables for automations</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>globals</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID to reference variable</td>
+                        <td rowspan="4">Store values across automations. Like variables in programming.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">type</span></td>
+                        <td><span class="param-type">C++ type</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Data type: int, float, bool, std::string, std::vector&lt;int&gt;, etc. Requires C++ knowledge.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">initial_value</span></td>
+                        <td><span class="param-type">any</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Type default</td>
+                        <td class="param-desc">Starting value on boot</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">restore_value</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Save to flash, restore on reboot. Uses preferences component.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>SCRIPT</strong> - Reusable automation sequences</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>script</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Script ID for calling</td>
+                        <td rowspan="3">Define reusable action sequences. Like functions/subroutines.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>single</td>
+                        <td class="param-desc">Execution mode: single (queue), restart (interrupt), parallel (unlimited), queued (limit queue)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">then</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions to execute when script called</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- BUS PROTOCOLS -->
+    <div class="section" data-section="bus">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>🔌 BUS PROTOCOLS - Hardware Communication (I2C, SPI, UART)</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Platforms</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ I2C BUS</strong> - Inter-Integrated Circuit (sensors, displays, I/O expanders)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="6"><strong>i2c</strong></td>
+                        <td><span class="param-name">sda</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>GPIO21 (ESP32), GPIO4 (ESP8266)</td>
+                        <td class="param-desc">Data line pin. Most boards have hardware defaults. Advanced: Supports pin schema with pullup.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">scl</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>GPIO22 (ESP32), GPIO5 (ESP8266)</td>
+                        <td class="param-desc">Clock line pin. Most boards have hardware defaults. Advanced: Supports pin schema with pullup.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">scan</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Scan for I2C devices on startup. Helps identify device addresses. Shows in logs.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">frequency</span></td>
+                        <td><span class="param-type">frequency</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>50kHz (100kHz NRF52)</td>
+                        <td class="param-desc">Bus speed: 10kHz, 50kHz, 100kHz, 200kHz...800kHz. Higher = faster but less reliable. Most sensors: 100kHz. Fast devices: 400kHz.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">timeout</span></td>
+                        <td><span class="param-type">Time</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>100us (ESP32), 1s (ESP8266/RP2040)</td>
+                        <td class="param-desc">I2C transaction timeout. Increase for slow devices or long cables.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Required for multiple I2C buses. Reference in sensor config with i2c_id.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ SPI BUS</strong> - Serial Peripheral Interface (high-speed sensors, displays, SD cards)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="8"><strong>spi</strong></td>
+                        <td><span class="param-name">clk_pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Clock pin (SCK). Shared by all devices on bus.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">mosi_pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Master Out Slave In (SDO). ESP→Device. Required unless only receiving. Shared by all devices.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">miso_pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Master In Slave Out (SDI). Device→ESP. Required unless only sending. Shared by all devices.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">interface</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>any</td>
+                        <td class="param-desc">SPI controller: any, hardware, software, spi, spi2, spi3. Hardware faster but limited pins. Software slower, any pins.</td>
+                        <td><span class="platform-tag">ESP32/ESP8266</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">type</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>single</td>
+                        <td class="param-desc">Bus type: single (1-bit), quad (4-bit), octal (8-bit). Quad/octal for high-speed displays.</td>
+                        <td><span class="platform-tag">ESP32 (quad), ESP32-S2/S3/P4 (octal)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">data_pins</span></td>
+                        <td><span class="param-type">list[Pin]</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">4 pins for quad, 8 pins for octal. Replaces mosi_pin/miso_pin. High-speed parallel data.</td>
+                        <td><span class="platform-tag">ESP32 variants</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Required for multiple SPI buses. Reference with spi_id in device config.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #d4edda; padding: 8px;"><strong>ℹ️ SPI DEVICE</strong> - Per-device SPI settings (CS pin, speed, mode)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">cs_pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Chip Select pin. Unique per device. Some devices can tie to GND if only device on bus.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">data_rate</span></td>
+                        <td><span class="param-type">frequency</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1MHz</td>
+                        <td class="param-desc">SPI clock speed: 80MHz, 40MHz, 20MHz, 10MHz, 5MHz, 4MHz, 2MHz, 1MHz, 200kHz, 75kHz, 1kHz. Check device datasheet.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">spi_mode</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>mode3</td>
+                        <td class="param-desc">SPI mode (clock polarity/phase): mode0, mode1, mode2, mode3. Check device datasheet.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">bit_order</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>msb_first</td>
+                        <td class="param-desc">Bit transmission order: msb_first or lsb_first. Device-specific.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ UART BUS</strong> - Serial communication (GPS, modbus, custom protocols)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="9"><strong>uart</strong></td>
+                        <td><span class="param-name">tx_pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Transmit pin. Optional if only receiving. Supports inverted: true for RS232 logic inversion.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">rx_pin</span></td>
+                        <td><span class="param-type">Pin</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Receive pin. Optional if only sending. Supports inverted: true.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">baud_rate</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Transmission speed in bps. Common: 9600, 115200. Must match device. Check datasheet.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">data_bits</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>8</td>
+                        <td class="param-desc">Bits per character: 5, 6, 7, 8. Usually 8.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">parity</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>NONE</td>
+                        <td class="param-desc">Error checking: NONE, EVEN, ODD. Device-specific.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">stop_bits</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1</td>
+                        <td class="param-desc">Stop bits: 1 or 2. Usually 1.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">rx_buffer_size</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>256</td>
+                        <td class="param-desc">Receive buffer size in bytes. Increase for high data rates or burst data. Uses RAM.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Required for multiple UART buses. ESP32 has 3 hardware UARTs. ESP8266 has 2 (one TX-only).</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">debug.direction</span></td>
+                        <td><span class="param-type">enum</span></td>
+                        <td><span class="badge advanced">ADVANCED</span></td>
+                        <td>BOTH</td>
+                        <td class="param-desc">Debug logging: RX, TX, or BOTH. For protocol analysis. Verbose output.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #d1ecf1; padding: 8px;"><strong>⚠️ IMPORTANT:</strong> ESP8266 UART0 (GPIO1/GPIO3) shared with logger by default. Disable logger (baud_rate: 0) to use UART0 for other purposes. ESP8266 has limited hardware UART - may fall back to software UART (less reliable at high speeds).</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- CLIMATE COMPONENTS -->
+    <div class="section" data-section="climate">
+        <div class="section-header component" onclick="toggleSection(this)">
+            <span>🌡️ CLIMATE - Temperature & HVAC Control</span>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="section-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Platform</th>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="7" style="background: #fff3cd; padding: 8px;"><strong>⚠️ BASE CONFIGURATION:</strong> All climate platforms</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="9"><strong>ALL</strong></td>
+                        <td><span class="param-name">id</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Unique ID</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">name</span></td>
+                        <td><span class="param-type">string</span></td>
+                        <td><span class="badge required">REQUIRED*</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Display name</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">visual.min_temperature</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Platform default</td>
+                        <td class="param-desc">Minimum temperature for UI slider (°C)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">visual.max_temperature</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>Platform default</td>
+                        <td class="param-desc">Maximum temperature for UI slider (°C)</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">visual.temperature_step</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>0.1</td>
+                        <td class="param-desc">Temperature adjustment granularity. Can split target/current separately.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">preset_modes</span></td>
+                        <td><span class="param-type">list</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>[]</td>
+                        <td class="param-desc">Preset modes: ECO, AWAY, BOOST, COMFORT, HOME, SLEEP, ACTIVITY. Platform-dependent.</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_state</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when climate state changes</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">on_control</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Trigger when climate controlled from HA</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">internal</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>false</td>
+                        <td class="param-desc">Hide from Home Assistant</td>
+                        <td><span class="platform-tag">All</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: THERMOSTAT</strong> - Flexible thermostat with deadbands</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="10"><strong>thermostat</strong></td>
+                        <td><span class="param-name">sensor</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Temperature sensor ID to monitor</td>
+                        <td rowspan="10">Classic thermostat logic. Triggers actions when temp crosses thresholds. Supports heat, cool, fan. Simpler than PID.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">default_target_temperature_low</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Default low setpoint for dual-point mode (°C)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">default_target_temperature_high</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Default high setpoint for dual-point mode (°C)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">heat_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions when heating needed (turn on heater relay, open valve, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">cool_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions when cooling needed (turn on AC, fan, etc.)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">idle_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions when at setpoint (turn off heating/cooling)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">heat_deadband</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>0.5°C</td>
+                        <td class="param-desc">Degrees below setpoint before heating starts. Prevents oscillation.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">heat_overrun</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>0.5°C</td>
+                        <td class="param-desc">Degrees above setpoint before heating stops. Accounts for overshoot.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">cool_deadband</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>0.5°C</td>
+                        <td class="param-desc">Degrees above setpoint before cooling starts</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">cool_overrun</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>0.5°C</td>
+                        <td class="param-desc">Degrees below setpoint before cooling stops</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: PID</strong> - Proportional-Integral-Derivative controller</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="13"><strong>pid</strong></td>
+                        <td><span class="param-name">sensor</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Temperature sensor ID to monitor</td>
+                        <td rowspan="13">Advanced control algorithm. Smooth temperature regulation, minimizes oscillation. For systems with thermal inertia (floor heating, ovens). Requires tuning.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">default_target_temperature</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Initial target temperature on boot (°C)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">heat_output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for heating (PWM/analog). One of heat_output or cool_output required.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">cool_output</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Float output ID for cooling. One of heat_output or cool_output required.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">control_parameters.kp</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Proportional gain. Use autotune to determine. Higher = faster response, more overshoot.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">control_parameters.ki</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Integral gain. Eliminates steady-state error. Higher = faster correction of persistent error.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">control_parameters.kd</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Derivative gain. Dampens oscillation. Higher = less overshoot, can amplify noise.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">output_averaging_samples</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1</td>
+                        <td class="param-desc">Smooth output over N samples. Reduces chatter. Useful with noisy sensors. 5-10 typical.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">derivative_averaging_samples</span></td>
+                        <td><span class="param-type">int</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>1</td>
+                        <td class="param-desc">Smooth derivative over N samples. Reduces noise sensitivity. 5-10 typical.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">deadband_parameters.threshold_high</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Stop adjusting when within this temp above setpoint. Prevents oscillation. E.g., 0.5°C</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">deadband_parameters.threshold_low</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Stop adjusting when within this temp below setpoint. E.g., -0.5°C</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">humidity_sensor</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Humidity sensor ID (for display/logging, not control)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #d4edda; padding: 8px;"><strong>🔧 PID AUTOTUNE</strong> - Available via climate.pid.autotune action. Creates button, runs oscillation test, calculates kp/ki/kd. Can take 30min-2hrs depending on system.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: BANG_BANG</strong> - Simple on/off control (legacy, use thermostat instead)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4"><strong>bang_bang</strong></td>
+                        <td><span class="param-name">sensor</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Temperature sensor ID</td>
+                        <td rowspan="4">Basic on/off control with deadband. Legacy component - thermostat platform is preferred. Simpler but less flexible.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">default_target_temperature_low</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Temperature to trigger heating (°C)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">default_target_temperature_high</span></td>
+                        <td><span class="param-type">float</span></td>
+                        <td><span class="badge required">REQUIRED</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Temperature to trigger cooling (°C)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">heat_action</span></td>
+                        <td><span class="param-type">automation</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Actions to execute for heating</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background: #e8f5e9; padding: 8px;"><strong>PLATFORM: CLIMATE_IR</strong> - Infrared remote control for AC units</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>climate_ir</strong></td>
+                        <td><span class="param-name">receiver_id</span></td>
+                        <td><span class="param-type">ID</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>-</td>
+                        <td class="param-desc">Remote receiver ID to learn commands</td>
+                        <td rowspan="3">Control AC units via IR. Supports many brands. Requires IR transmitter (+ optional receiver). Advanced: protocol-specific.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">supports_heat</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Device supports heating mode</td>
+                    </tr>
+                    <tr>
+                        <td><span class="param-name">supports_cool</span></td>
+                        <td><span class="param-type">boolean</span></td>
+                        <td><span class="badge optional">OPTIONAL</span></td>
+                        <td>true</td>
+                        <td class="param-desc">Device supports cooling mode</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const chevron = header.querySelector('.chevron');
+            content.classList.toggle('show');
+            chevron.classList.toggle('open');
+        }
+
+        function expandAll() {
+            document.querySelectorAll('.section-content').forEach(c => c.classList.add('show'));
+            document.querySelectorAll('.chevron').forEach(c => c.classList.add('open'));
+        }
+
+        function collapseAll() {
+            document.querySelectorAll('.section-content').forEach(c => c.classList.remove('show'));
+            document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
+        }
+
+        function filterAll() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const platformFilter = document.getElementById('platformFilter').value;
+
+            document.querySelectorAll('.section').forEach(section => {
+                let sectionVisible = false;
+                const rows = section.querySelectorAll('tbody tr');
+
+                rows.forEach(row => {
+                    if (row.cells.length < 2) { // Skip info rows
+                        row.style.display = '';
+                        return;
+                    }
+
+                    let visible = true;
+
+                    // Search filter
+                    if (searchTerm) {
+                        const text = row.textContent.toLowerCase();
+                        visible = visible && text.includes(searchTerm);
+                    }
+
+                    // Category filter
+                    if (categoryFilter) {
+                        const badges = row.querySelectorAll('.badge');
+                        const hasCategory = Array.from(badges).some(badge => 
+                            badge.className.includes(categoryFilter)
+                        );
+                        visible = visible && hasCategory;
+                    }
+
+                    // Platform filter
+                    if (platformFilter) {
+                        const platforms = row.querySelectorAll('.platform-tag');
+                        const hasPlatform = Array.from(platforms).some(tag => 
+                            tag.textContent.includes(platformFilter) || tag.textContent === 'All'
+                        );
+                        visible = visible && hasPlatform;
+                    }
+
+                    row.style.display = visible ? '' : 'none';
+                    if (visible) sectionVisible = true;
+                });
+
+                section.style.display = sectionVisible ? '' : 'none';
+            });
+        }
+
+        function exportToCSV() {
+            let csv = 'Section,Component,Parameter,Type,Status,Default,Description,Platforms/UseCase\n';
+            
+            document.querySelectorAll('.section').forEach(section => {
+                const sectionHeader = section.querySelector('.section-header').textContent.trim();
+                const sectionName = sectionHeader.split(' - ')[0].replace(/[🖥️⚙️📝📡🔌📲🔘⚫📊📤💡🌀✨🔌🌡️]/g, '').trim();
+                const table = section.querySelector('table');
+                if (!table) return;
+                
+                const rows = table.querySelectorAll('tbody tr');
+                let currentComponent = '';
+                
+                rows.forEach(row => {
+                    if (row.style.display === 'none') return;
+                    
+                    const cells = Array.from(row.cells);
+                    
+                    // Skip info rows (colspan > 1 on first cell or less than 4 cells)
+                    if (cells.length < 4 || (cells[0].colSpan && cells[0].colSpan > 1)) {
+                        return;
+                    }
+                    
+                    try {
+                        let component, param, type, status, defaultVal, desc, platforms;
+                        
+                        // Determine table structure by column count
+                        if (cells.length === 7) {
+                            // Structure: Component | Parameter | Type | Status | Default | Description | Platforms
+                            if (cells[0].rowSpan > 1) {
+                                currentComponent = cells[0].textContent.trim();
+                            }
+                            component = currentComponent || cells[0].textContent.trim();
+                            param = cells[1].textContent.trim();
+                            type = cells[2].textContent.trim();
+                            status = cells[3].textContent.trim();
+                            defaultVal = cells[4].textContent.trim();
+                            desc = cells[5].textContent.trim();
+                            platforms = cells[6].textContent.trim();
+                        } else if (cells.length === 6) {
+                            // Structure: Parameter | Type | Status | Default | Description | Platforms
+                            component = sectionName;
+                            param = cells[0].textContent.trim();
+                            type = cells[1].textContent.trim();
+                            status = cells[2].textContent.trim();
+                            defaultVal = cells[3].textContent.trim();
+                            desc = cells[4].textContent.trim();
+                            platforms = cells[5].textContent.trim();
+                        } else {
+                            return; // Skip malformed rows
+                        }
+                        
+                        // Clean up text
+                        desc = desc.replace(/"/g, '""').replace(/\n/g, ' ').replace(/\s+/g, ' ');
+                        param = param.replace(/"/g, '""');
+                        
+                        // Only add if we have actual parameter data
+                        if (param && param.length > 0 && !param.includes('⚠️') && !param.includes('PLATFORM:')) {
+                            csv += `"${sectionName}","${component}","${param}","${type}","${status}","${defaultVal}","${desc}","${platforms}"\n`;
+                        }
+                    } catch (e) {
+                        console.error('Error processing row:', e, row);
+                    }
+                });
+            });
+            
+            // Create and download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'esphome_components_full_detail.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            // Show success message
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Downloaded!';
+            btn.style.background = '#27ae60';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#27ae60';
+            }, 2000);
+        }
+
+        function showRowCount() {
+            let count = 0;
+            const breakdown = {};
+            
+            document.querySelectorAll('.section').forEach(section => {
+                const sectionHeader = section.querySelector('.section-header').textContent.trim();
+                const sectionName = sectionHeader.split(' - ')[0].replace(/[🖥️⚙️📝📡🔌📲🔘⚫📊📤💡🌀✨🔌🌡️]/g, '').trim();
+                const table = section.querySelector('table');
+                if (!table) return;
+                
+                let sectionCount = 0;
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const cells = Array.from(row.cells);
+                    
+                    // Skip info rows
+                    if (cells.length < 4 || (cells[0].colSpan && cells[0].colSpan > 1)) {
+                        return;
+                    }
+                    
+                    try {
+                        let param;
+                        if (cells.length === 7) {
+                            param = cells[1].textContent.trim();
+                        } else if (cells.length === 6) {
+                            param = cells[0].textContent.trim();
+                        }
+                        
+                        if (param && param.length > 0 && !param.includes('⚠️') && !param.includes('PLATFORM:')) {
+                            count++;
+                            sectionCount++;
+                        }
+                    } catch (e) {
+                        // Skip problem rows
+                    }
+                });
+                
+                if (sectionCount > 0) {
+                    breakdown[sectionName] = sectionCount;
+                }
+            });
+            
+            let message = `Total rows in CSV: ${count + 1} (including header)\n\nBreakdown by section:\n`;
+            Object.entries(breakdown).forEach(([section, cnt]) => {
+                message += `${section}: ${cnt} parameters\n`;
+            });
+            
+            alert(message);
+        }
+
+        function exportDefinitions() {
+            const definitions = [
+                // STATUS LABELS
+                {category: "Status Labels", term: "REQUIRED", definition: "Parameter must ALWAYS be configured. Device will not compile or function without it.", examples: "uart.baud_rate, ota.platform, esphome.name, esp32.variant (if no board specified)", notes: "No exceptions - mandatory in all configurations."},
+                {category: "Status Labels", term: "REQUIRED*", definition: "Conditionally required - depends on other settings or 'at least one of' scenarios.", examples: "esp32.variant (required unless board set), switch.id (required unless name set), wifi.ssid (required unless using networks[]), wifi.manual_ip.gateway (required only if static_ip set)", notes: "Check description column for specific condition."},
+                {category: "Status Labels", term: "RECOMMENDED", definition: "Strongly advised for production use. Device works without it, but user experience significantly degraded.", examples: "esphome.friendly_name (better UX in HA), wifi.manual_ip.static_ip (faster connections), api.encryption.key (security)", notes: "Best practice. Most users should configure this."},
+                {category: "Status Labels", term: "OPTIONAL", definition: "Nice to have, enhances functionality. Device works fine without it.", examples: "logger.level, wifi.ap (fallback), switch.on_turn_on, sensor.filters, light.effects", notes: "User adds based on specific needs."},
+                {category: "Status Labels", term: "ADVANCED", definition: "Requires technical knowledge. Can cause issues if misconfigured. Meets criteria: (1) Technical complexity, (2) Rarely used, (3) Risk of breaking device, (4) Requires prerequisites.", examples: "esp32.framework.sdkconfig_options, i2c.timeout, api.max_connections, gpio.interlock, esphome.on_loop", notes: "Expert users only. Can break device if misconfigured."},
+                
+                // PLATFORMS
+                {category: "Platforms", term: "ESP32", definition: "Espressif ESP32 family microcontrollers. Supports WiFi, Bluetooth, multiple UARTs, hardware PWM.", examples: "Variants: esp32 (original), esp32s2, esp32s3 (camera), esp32c3 (RISC-V), esp32c6 (WiFi 6)", notes: "Most capable. 240MHz dual-core. 520KB RAM."},
+                {category: "Platforms", term: "ESP8266", definition: "Original Espressif WiFi chip. Lower cost, less powerful than ESP32.", examples: "NodeMCU, Wemos D1 Mini, ESP-01", notes: "80MHz single-core. ~40KB free RAM. Software PWM (can flicker)."},
+                {category: "Platforms", term: "RP2040", definition: "Raspberry Pi microcontroller. ARM Cortex-M0+. No built-in WiFi.", examples: "Raspberry Pi Pico, Pico W (with WiFi)", notes: "133MHz dual-core. 264KB RAM."},
+                
+                // CORE CONCEPTS
+                {category: "Core Concepts", term: "Component", definition: "Self-contained functional unit in ESPHome.", examples: "wifi, switch, sensor, i2c", notes: "Components have platforms (implementations)."},
+                {category: "Core Concepts", term: "Platform", definition: "Specific implementation of a component.", examples: "sensor platforms: template, uptime, dht, bme280", notes: "Choose platform based on hardware/use case."},
+                {category: "Core Concepts", term: "ID", definition: "Unique identifier for referencing components.", examples: "id: my_pwm, then reference: output: my_pwm", notes: "Must be unique. Becomes C++ variable name."},
+                {category: "Core Concepts", term: "Automation", definition: "Actions triggered by events.", examples: "on_boot, on_turn_on, on_press, on_value", notes: "Core of ESPHome customization."},
+                {category: "Core Concepts", term: "Lambda", definition: "Inline C++ code for custom logic.", examples: "lambda: 'return id(sensor).state > 30;'", notes: "Requires C++ knowledge. Advanced feature."},
+                
+                // BUS PROTOCOLS
+                {category: "Bus Protocols", term: "I2C", definition: "2-wire bus (SDA/SCL) for moderate-speed communication.", examples: "BME280, SSD1306 displays, PCF8574 I/O expanders", notes: "Shared bus, unique addresses. 100kHz typical."},
+                {category: "Bus Protocols", term: "SPI", definition: "4+ wire high-speed bus (CLK/MOSI/MISO + CS).", examples: "ILI9341 displays, MAX31855 thermocouples, SD cards", notes: "Faster than I2C. Unique CS pin per device."},
+                {category: "Bus Protocols", term: "UART", definition: "2-wire serial communication (TX/RX).", examples: "GPS modules, Modbus, fingerprint readers", notes: "Point-to-point. Speed must match (baud_rate)."},
+                
+                // NETWORKING
+                {category: "Networking", term: "Native API", definition: "ESPHome's protocol for Home Assistant. Fast, encrypted.", examples: "Automatic HA discovery, real-time updates", notes: "Preferred over MQTT. Port 6053."},
+                {category: "Networking", term: "MQTT", definition: "Publish/subscribe messaging protocol.", examples: "Integration with Node-RED, OpenHAB", notes: "Requires MQTT broker. Alternative to API."},
+                {category: "Networking", term: "OTA", definition: "Wireless firmware updates over WiFi.", examples: "Update from HA without USB cable", notes: "Essential after initial flash."},
+                {category: "Networking", term: "Captive Portal", definition: "Fallback WiFi setup via web interface.", examples: "After 1min fail, creates AP at 192.168.4.1", notes: "Great for maker projects."},
+                
+                // DATA TYPES
+                {category: "Data Types", term: "Time", definition: "Duration or time period.", examples: "1s, 100ms, 5min, 2h, never", notes: "Formats: s, ms, min, h"},
+                {category: "Data Types", term: "Frequency", definition: "Rate in Hertz.", examples: "1kHz, 100kHz, 1MHz, 40MHz", notes: "Formats: Hz, kHz, MHz"},
+                {category: "Data Types", term: "Pin", definition: "GPIO pin reference.", examples: "GPIO5, D1, 16", notes: "Simple or advanced schema."},
+                
+                // TROUBLESHOOTING
+                {category: "Troubleshooting", term: "Strapping Pins", definition: "ESP32 pins read at boot to determine boot mode.", examples: "GPIO0, GPIO2, GPIO5, GPIO12, GPIO15", notes: "Risky for I/O. Can prevent boot."},
+                {category: "Troubleshooting", term: "Reserved Pins", definition: "Pins used for flash memory. Cannot use for GPIO.", examples: "GPIO6-11 (flash interface)", notes: "ESPHome prevents usage."},
+                {category: "Troubleshooting", term: "Floating Pin", definition: "Pin not connected to defined voltage.", examples: "Button without pullup → random values", notes: "Fix: Enable pullup/pulldown resistor."},
+                
+                // BEST PRACTICES
+                {category: "Best Practices", term: "Use Secrets", definition: "Store sensitive data in secrets.yaml.", examples: "wifi: password: !secret wifi_password", notes: "Prevents credentials in git."},
+                {category: "Best Practices", term: "Static IP", definition: "Fixed IP instead of DHCP.", examples: "manual_ip: {static_ip: 192.168.1.100, gateway: 192.168.1.1, subnet: 255.255.255.0}", notes: "Dramatically improves connection speed."}
+            ];
+
+            let csv = 'Category,Term,Definition,Examples,Notes\n';
+            definitions.forEach(def => {
+                const row = [def.category, def.term, def.definition, def.examples, def.notes]
+                    .map(f => '"' + String(f).replace(/"/g, '""') + '"');
+                csv += row.join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'esphome_definitions.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✅ Downloaded!';
+            btn.style.background = '#229954';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '#27ae60';
+            }, 2000);
+        }
+
+        // Auto-expand core sections on load
+        window.addEventListener('load', () => {
+            document.querySelectorAll('[data-section="core"], [data-section="platform"]').forEach(section => {
+                section.querySelector('.section-content').classList.add('show');
+                section.querySelector('.chevron').classList.add('open');
+            });
+        });
+    </script>
+</body>
+</html>
